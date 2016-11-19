@@ -13,7 +13,8 @@ import { Brands } from '../../api/brands/brands';
 export default MainPageContainer = createContainer(({}) => {
 	const loading = !FlowRouter.subsReady(),
 		cart = Cart.findOne(),
-		products = Boolean(cart) ? cart.getProducts() : Products.find().fetch(),
+        baseProducts = Products.find().fetch(),
+		products = Boolean(cart) ? cart.getProducts(baseProducts) : baseProducts,
 		isExistPage = !loading,
 		brands = Brands.find().fetch();
 	return {

@@ -42,7 +42,7 @@ export default class AddToCart extends React.Component {
 		return (
 			<a>
 				{ product.count && !product.isAdded ?
-					<span className='btn btnstar-rating-add-to-cart' onClick={this.addToCart.bind(this, product)}>
+					<span className='btn btn-add-to-cart' onClick={this.addToCart.bind(this, product)}>
 						<i className='fa fa-shopping-cart'></i>Add to cart</span>
 					: null }
 				{ product.count && product.isAdded ?

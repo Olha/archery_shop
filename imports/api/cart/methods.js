@@ -4,42 +4,47 @@ import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 import { _ } from 'meteor/underscore';
 import { Cart } from './cart.js';
+import { Products } from '/imports/api/products/products';
 
 export const addToCart = new ValidatedMethod({
   name: 'cart.add',
   validate: new SimpleSchema({
-    contactId: { type: String },
-    productId: { type: String },
-    count: { type: Number },
+    contactId: { type: SimpleSchema.RegEx.Id },
+    productId: { type: SimpleSchema.RegEx.Id },
+    count: {
+      type: Number,
+      decimal: false,
+      min: 1,
+      custom() {
+        const productId = this.field('productId').value;
+        const count = this.value;
+        const isCountOK = Products.find({ _id: productId, count: { $lte: count } });
+        if (!isCountOK) {
+          return console.error('Count is too big');
+        }
+        return console.info('Added to cart');
+      },
+    },
   }).validator(),
   run({ contactId, productId, count }) {
-    const isExistsCart = Cart.findOne({ contactId });
-    /* in future use upsert */
-    if (isExistsCart) {
-      Cart.update({ contactId },
-        { $push: {
-          products: {
-            item: productId,
-            count },
-        },
-        });
-    } else {
-      Cart.insert({
-        contactId,
-        products: [{
+    Cart.upsert({
+      contactId,
+    }, {
+      $push: {
+        products: {
           item: productId,
           count,
-        }],
-      });
-    }
+        },
+      },
+    });
   },
 });
 
 export const changeCartItemCount = new ValidatedMethod({
   name: 'cart.item.count.change',
   validate: new SimpleSchema({
-    contactId: { type: String },
-    productId: { type: String },
+    contactId: { type: SimpleSchema.RegEx.Id },
+    productId: { type: SimpleSchema.RegEx.Id },
     count: { type: Number },
   }).validator(),
   run({ contactId, productId, count }) {
@@ -53,8 +58,8 @@ export const changeCartItemCount = new ValidatedMethod({
 export const updateCartItemId = new ValidatedMethod({
   name: 'cart.item.id.update',
   validate: new SimpleSchema({
-    cartId: { type: String },
-    contactId: { type: String },
+    cartId: { type: SimpleSchema.RegEx.Id },
+    contactId: { type: SimpleSchema.RegEx.Id },
   }).validator(),
   run({ cartId, contactId }) {
     Cart.update({ _id: cartId },
@@ -66,8 +71,8 @@ export const updateCartItemId = new ValidatedMethod({
 export const removeCartItem = new ValidatedMethod({
   name: 'cart.item.remove',
   validate: new SimpleSchema({
-    contactId: { type: String },
-    productId: { type: String },
+    contactId: { type: SimpleSchema.RegEx.Id },
+    productId: { type: SimpleSchema.RegEx.Id },
   }).validator(),
   run({ contactId, productId }) {
     Cart.update({ contactId },
@@ -87,8 +92,6 @@ if (Meteor.isServer) {
     name(name) {
       return _.contains(CART_METHODS, name);
     },
-
-    // Rate limit per connection ID
     connectionId() { return true; },
   }, 5, 1000);
 }

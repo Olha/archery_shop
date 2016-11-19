@@ -1,4 +1,5 @@
 /* eslint arrow-body-style: ["error", "always"] */
+/* eslint no-unused-expressions: "error" */
 /* eslint no-param-reassign: "error" */
 /* eslint-env es6 */
 
@@ -50,60 +51,52 @@ Cart.schema = new SimpleSchema({
 
 Cart.attachSchema(Cart.schema);
 
+const getCurrentCartProduct = (cartItems, product) => {
+  const pId = product._id;
+  return _.find(cartItems, (elem) => {
+    return elem.item === pId;
+  });
+};
+
+const updateTotalPrice = (cartProduct, dbProduct) => {
+  const product = dbProduct;
+  if (Boolean(cartProduct)) {
+    product.currentCount = cartProduct.count || 0;
+    product.totalPrice = product.currentCount * product.price.value;
+    product.isAdded = true;
+  }
+  return product;
+};
+
+const getCartProduct = (cartItems, product, isAdded) => {
+  const currentCartProduct = getCurrentCartProduct(cartItems, product);
+  return updateTotalPrice(currentCartProduct, product, isAdded);
+};
+
+const getProductsList = (cartItems, products) => {
+  return _.filter(products, (product) => {return getCartProduct(cartItems, product); }) || [];
+};
+
 Cart.helpers({
   userCartProducts() {
     const productIds = _.map(this.products, (elem) => {
       return elem.item;
     });
     const products = Products.find({ _id: { $in: productIds } }).fetch();
-    const currentProducts = _.filter(products, (product) => {
-      const cartProduct = product;
-      const currentProduct = _.find(this.products, (elem) => {
-        return elem.item === cartProduct._id;
-      });
-      if (Boolean(currentProduct)) {
-        cartProduct.currentCount = currentProduct.count || 0;
-        cartProduct.totalPrice = cartProduct.currentCount * cartProduct.price.value;
-        return cartProduct;
-      }
-      return cartProduct;
-    });
-    return currentProducts;
+    return getProductsList(this.products, products);
   },
   getSubTotalPrice(products) {
-    let subTotalPrice = 0;
-    _.map(products, (product) => {
-      if (Boolean(product)) {
-        subTotalPrice += product.totalPrice;
-      }
-    });
-    return subTotalPrice;
+    return _.reduce(
+      products,
+      (sum, product) => {
+        return product ? sum + product.totalPrice : sum;
+      }, 0
+    );
   },
   getCartProduct(product) {
-    const cartProduct = product;
-    const currentProduct = _.find(this.products, (elem) => {
-      return elem.item === cartProduct._id;
-    });
-    if (Boolean(currentProduct)) {
-      cartProduct.currentCount = currentProduct.count || 0;
-      cartProduct.totalPrice = cartProduct.currentCount * cartProduct.price.value;
-      cartProduct.isAdded = true;
-    }
-    return cartProduct;
+    return getCartProduct(this.products, product);
   },
-  getProducts() {
-    const products = Products.find().fetch();
-    const currentProducts = _.filter(products, (product) => {
-      const baseProduct = product;
-      const currentProduct = _.find(this.products, (elem) => {
-        return elem.item === baseProduct._id;
-      });
-      if (Boolean(currentProduct)) {
-        baseProduct.currentCount = currentProduct.count || 0;
-        baseProduct.totalPrice = baseProduct.currentCount * baseProduct.price.value;
-      }
-      return baseProduct;
-    });
-    return currentProducts;
+  getProducts(products) {
+    return getProductsList(this.products, products);
   },
 });
