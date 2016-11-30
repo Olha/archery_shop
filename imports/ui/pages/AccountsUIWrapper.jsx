@@ -1,15 +1,11 @@
-import { Meteor } from 'meteor/meteor';
 import React from 'react';
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom';
 import AuthPage from './AuthPage.jsx';
 
 import { Template } from 'meteor/templating';
 import { Blaze } from 'meteor/blaze';
 
 export default class AccountsUIWrapper extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   componentDidMount() {
     // Use Meteor Blaze to render login buttons
     this.view = Blaze.render(Template.loginButtons,
@@ -22,12 +18,11 @@ export default class AccountsUIWrapper extends React.Component {
 
   render() {
     const content = (
-        <span ref='container' ></span>
+        <span ref="container" ></span>
     );
     // Just render a placeholder container that will be filled in
-    return <AuthPage content={content}/>;
+    return <AuthPage content={content} />;
   }
-
 }
 
 AccountsUIWrapper.contextTypes = {

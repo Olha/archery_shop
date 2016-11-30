@@ -1,5 +1,4 @@
 import React from 'react';
-import ListHeader from '../components/ListHeader.jsx';
 import ProductsFilter from '../components/ProductsFilter.jsx';
 import NotFoundPage from '../pages/NotFoundPage.jsx';
 import Message from '../components/Message.jsx';
@@ -13,38 +12,34 @@ export default class ListPage extends React.Component {
     };
     this.onEditingChange = this.onEditingChange.bind(this);
   }
-
   onEditingChange(id, editing) {
     this.setState({
       editingProduct: editing ? id : null,
     });
   }
-
   render() {
     const { isExistPage, loading, products, lists, brands, types, cart } = this.props;
     if (Boolean(cart) && Boolean(products.length)) {
-      _.map(cart.products, (elem, i) => {
-        let product = _.findWhere(products, {_id: elem.item});
+      _.map(cart.products, (elem) => {
+        const product = _.findWhere(products, { _id: elem.item });
         if (product) {
           product.isAdded = true;
         }
       });
     }
-
     if (!isExistPage) {
-      return <NotFoundPage/>;
+      return <NotFoundPage />;
     }
-
     return (
-        <div id='page-wrapper'>
-          { loading ? <Message title='Loading...'/> :
-              <ProductsFilter
-                  lists={lists}
-                  brands={brands}
-                  products={products}
-                  types={types}
-              /> }
-        </div>
+      <div id="page-wrapper">
+        { loading ? <Message title="Loading..." /> :
+          <ProductsFilter
+            lists={lists}
+            brands={brands}
+            products={products}
+            types={types}
+          /> }
+      </div>
     );
   }
 }
@@ -56,4 +51,6 @@ ListPage.propTypes = {
   products: React.PropTypes.array,
   loading: React.PropTypes.bool,
   isExistPage: React.PropTypes.bool,
+  cart: React.PropTypes.any,
 };
+

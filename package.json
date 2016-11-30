@@ -6,25 +6,44 @@
     "test": "meteor test --once --driver-package dispatch:mocha-phantomjs",
     "test-watch": "meteor test --driver-package practicalmeteor:mocha",
     "test-app-watch": "meteor test --full-app --driver-package practicalmeteor:mocha",
-    "lint": "eslint .",
+    "lint": "eslint --ext .js --ext .jsx .",
     "chimp-watch": "chimp --ddp=http://localhost:3000 --watch --mocha --path=tests"
   },
   "eslintConfig": {
-    "parser": "babel-eslint",
     "parserOptions": {
-      "allowImportExportEverywhere": true
+      "ecmaVersion": 6,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
     },
     "plugins": [
-      "meteor"
+      "meteor",
+      "react"
     ],
     "extends": [
       "airbnb",
-      "plugin:meteor/recommended"
+      "plugin:meteor/recommended",
+      "eslint:recommended",
+      "plugin:react/recommended"
     ],
-    "settings": {
-      "import/resolver": "meteor"
-    },
-    "rules": {}
+    "rules": {
+      "meteor/eventmap-params": [
+        2,
+        {
+          "eventParamName": "event",
+          "templateInstanceParamName": "instance"
+        }
+      ],
+      "meteor/template-names": [
+        0
+      ],
+      "meteor/no-session": [
+        0
+      ],
+      "no-console": "off",
+      "no-extra-boolean-cast": 1
+    }
   },
   "dependencies": {
     "autoprefixer": "^6.3.1",
@@ -37,7 +56,7 @@
     "react-addons-pure-render-mixin": "^15.2.1",
     "react-addons-test-utils": "^15.2.1",
     "react-dom": "^15.2.1",
-    "react-masonry-component": "^4.3.1",
+    "react-masonry-component": "^4.4.0",
     "react-mounter": "^1.2.0",
     "react-router": "^2.6.0",
     "react-select": "https://registry.npmjs.org/react-select/-/react-select-1.0.0-beta14.tgz",
@@ -68,31 +87,6 @@
     "react-transform-hmr": "^1.0.4",
     "redbox-react": "^1.3.1",
     "ws": "^1.1.1"
-  },
-  "eslintConfig": {
-    "parserOptions": {
-      "ecmaVersion": 6,
-      "sourceType": "module"
-    },
-    "plugins": [
-      "meteor"
-    ],
-    "extends": [
-      "airbnb",
-      "plugin:meteor/recommended"
-    ],
-    "rules": {
-      "meteor/eventmap-params": [
-        2,
-        {
-          "eventParamName": "event",
-          "templateInstanceParamName": "instance"
-        }
-      ],
-      "meteor/template-names": [
-        0
-      ]
-    }
   },
   "postcss": {
     "plugins": {

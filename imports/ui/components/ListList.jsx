@@ -3,27 +3,23 @@ import React from 'react';
 import { FlowHelpers } from '../../../lib/client/route-helpers';
 
 export default class ListList extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const { lists } = this.props;
     return (
-      <div className='list-products'>
+      <div className="list-products">
         <a
           href={FlowHelpers.pathFor('/lists')}
-          title='All products'
-          className='list-product'
+          title="All products"
+          className="list-product"
         >
           All products {FlowHelpers.currentRoute}
         </a>
         {lists.map(list => (
           <a
-            href={FlowHelpers.pathFor(`/lists/${ list._id }`)}
+            href={FlowHelpers.pathFor(`/lists/${list._id}`)}
             key={list._id}
             title={list.name}
-            className='list-product'
+            className="list-product"
           >
             {list.name}
           </a>

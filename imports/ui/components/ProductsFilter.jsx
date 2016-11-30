@@ -8,48 +8,45 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
 import {
-  filterProducts
+  filterProducts,
 } from '../../api/products/methods';
 
 export default class ProductsFilter extends React.Component {
   constructor(props) {
     super(props);
-    
-    const { lists, brands, products, types } = props;
+    const { brands, products, types } = props;
     const optionsBrand = this.makePreviewForSelect(brands);
     const optionsType = this.makePreviewForSelect(types);
     const filterKeys = {
       brand: null,
-      type: null
+      type: null,
     };
     this.state = {
       filterKeys,
-      optionsBrand: optionsBrand,
-      optionsType: optionsType,
+      optionsBrand,
+      optionsType,
       disabled: false,
       searchable: false,
       clearable: true,
-      products: products
+      products,
     };
   }
-  
-  updateValue (...props) {
+  updateValue(...props) {
     const [nameValue, newValue] = props;
-    this.state.filterKeys[nameValue] = newValue;
-    let filterResults= {};
-    _.map(this.state.filterKeys, (val, key) => {
+    let filterKeysState = this.state.filterKeys;
+    filterKeysState[nameValue] = newValue;
+    const filterResults = {};
+    _.map(filterKeysState, (val, key) => {
       if (Boolean(val)) {
         filterResults[key] = val;
       }
-    } );
-    
+    });
     this.setState({
-      filterKeys: this.state.filterKeys,
-      products: filterProducts.call(filterResults,  displayError)
+      filterKeys: filterKeysState,
+      products: filterProducts.call(filterResults, displayError),
     });
   }
-  
-  makePreviewForSelect (outList) {
+  makePreviewForSelect(outList) {
     outList = outList || [];
     outList.forEach((list) => {
       list.value = list._id;
@@ -57,14 +54,13 @@ export default class ProductsFilter extends React.Component {
     });
     return outList;
   }
-  
   render() {
     let Products;
     if (!this.state.products || !this.state.products.length) {
       Products = (
         <Message
-          title='No products here'
-          subtitle='Change searching'
+          title="No products here"
+          subtitle="Change searching"
         />
       );
     } else {
@@ -77,45 +73,55 @@ export default class ProductsFilter extends React.Component {
     }
     return (
       <div>
-        <nav className=''>
-          <ul className='list-filter'>
+        <nav className="">
+          <ul className="list-filter">
             <li>
               <span>Search by brand</span>
               <Select
-                placeholder='Select brand ...'
-                ref='stateSelectBrand'
+                placeholder="Select brand ..."
+                ref="stateSelectBrand"
                 options={this.state.optionsBrand}
                 simpleValue
                 clearable={this.state.clearable}
-                name='selected-state'
+                name="selected-state"
                 disabled={this.state.disabled}
                 value={this.state.filterKeys.brand}
                 onChange={this.updateValue.bind(this, 'brand')}
-                searchable={this.state.searchable}/>
+                searchable={this.state.searchable}
+              />
             </li>
             <li>
               <span>Search by type</span>
               <Select
-                placeholder='Select type ...'
-                ref='stateSelectType'
+                placeholder="Select type ..."
+                ref="stateSelectType"
                 options={this.state.optionsType}
                 simpleValue
                 clearable={this.state.clearable}
-                name='selected-state'
+                name="selected-state"
                 disabled={this.state.disabled}
                 value={this.state.filterKeys.type}
                 onChange={this.updateValue.bind(this, 'type')}
-                searchable={this.state.searchable}/>
+                searchable={this.state.searchable}
+              />
             </li>
           </ul>
         </nav>
-        <div className='content-scrollable list-items'>
+        <div className="content-scrollable list-items">
           { Products }
         </div>
       </div>
     );
   }
 }
+
+ProductsFilter.propTypes = {
+  brands: React.PropTypes.array,
+  products: React.PropTypes.array,
+  types: React.PropTypes.array,
+};
+
 ProductsFilter.contextTypes = {
   router: React.PropTypes.object,
 };
+

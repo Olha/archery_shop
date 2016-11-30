@@ -2,13 +2,12 @@ import { AppContainer as AppCont } from 'react-hot-loader';
 import React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { Meteor } from 'meteor/meteor';
-import { Session } from 'meteor/session'; // XXX: SESSION
-import { Lists } from '../../api/lists/lists.js';
-import UserMenu from '../components/UserMenu.jsx';
-import ListList from '../components/ListList.jsx';
-import ListHeader from '../components/ListHeader.jsx';
-import ConnectionNotification from '../components/ConnectionNotification.jsx';
-import Loading from '../components/Loading.jsx';
+
+import ListHeader from '../components/ListHeader';
+import UserMenu from '../components/UserMenu';
+import ListList from '../components/ListList';
+import ConnectionNotification from '../components/ConnectionNotification';
+import Loading from '../components/Loading';
 
 const CONNECTION_ISSUE_TIMEOUT = 5000;
 
@@ -20,33 +19,28 @@ export default class App extends React.Component {
     };
     this.logout = this.logout.bind(this);
   }
-
   componentDidMount() {
     setTimeout(() => {
       /* eslint-disable react/no-did-mount-set-state */
       this.setState({ showConnectionIssue: true });
     }, CONNECTION_ISSUE_TIMEOUT);
   }
-
-
   logout() {
     Meteor.logout();
   }
-
   render() {
     const { showConnectionIssue } = this.state;
     const {
       user,
       connected,
       loading,
-	    subTotalPrice,
-	    productCart,
+      subTotalPrice,
+      productCart,
       main,
       lists,
       children,
       location,
     } = this.props;
-
     // clone route components with keys so that they can
     // have transitions
     const clonedChildren = children && React.cloneElement(children, {
@@ -54,26 +48,26 @@ export default class App extends React.Component {
     });
     return (
       <AppCont>
-	      <div id='page-wrapper'>
-		      <ListHeader productCart={productCart} subTotalPrice={subTotalPrice}/>
+        <div id="page-wrapper">
+          <ListHeader productCart={productCart} subTotalPrice={subTotalPrice} />
           <section>
-            <UserMenu user={user} logout={this.logout}/>
-            <ListList lists={lists}/>
+            <UserMenu user={user} logout={this.logout} />
+            <ListList lists={lists} />
           </section>
           {showConnectionIssue && !connected
-            ? <ConnectionNotification/>
+            ? <ConnectionNotification />
             : null}
-          <div id='content-container'>
+          <div id="content-container">
             {main}
             <ReactCSSTransitionGroup
-             transitionName='fade'
-             transitionEnterTimeout={200}
-             transitionLeaveTimeout={200}
-             >
-             {loading
-             ? <Loading key='loading'/>
-             : clonedChildren}
-             </ReactCSSTransitionGroup>
+              transitionName="fade"
+              transitionEnterTimeout={200}
+              transitionLeaveTimeout={200}
+            >
+              {loading
+                ? <Loading key="loading" />
+                : clonedChildren}
+            </ReactCSSTransitionGroup>
           </div>
         </div>
       </AppCont>
@@ -89,4 +83,7 @@ App.propTypes = {
   children: React.PropTypes.element, // matched child route component
   location: React.PropTypes.object,  // current router location
   params: React.PropTypes.object,    // parameters of the current route
+  subTotalPrice: React.PropTypes.number,
+  productCart: React.PropTypes.array,
+  main: React.PropTypes.any,
 };
